@@ -1,0 +1,25 @@
+<?php
+	//drupal_set_message('sdfsdfsdf');
+function login_history_user_login(&$edit, $account) {
+	
+	db_insert('login_history')
+		->fields(
+			array(
+				'uid' => $account->uid,
+				'login' => $account->login
+			))->execute();
+}
+
+function login_history_user_view_alter(&$build) {
+	global $user;
+
+	$login_count = db_query('Select count(*) from {login_history} where uid = :uid', array(':uid' => $user->uid))->fetchField();
+
+	$build['summary']['login_history'] = array(
+			'#type' => 'user_profile_item',
+			'#title' => t('Number of loing'),
+			'#markup' => $login_count,
+			'#weight' => 100,
+		);
+
+}
